@@ -1,0 +1,50 @@
+---
+title: "new-class-search"
+author: "Gabe Cederberg"
+date: "3/3/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readxl)
+library(janitor)
+```
+
+```{r}
+
+url2020 <- "https://registrar.fas.harvard.edu/files/fas-registrar/files/class_enrollment_summary_by_term_2.25.20_0.xlsx"
+
+url2019 <- "https://registrar.fas.harvard.edu/files/fas-registrar/files/class_enrollment_summary_by_term_3.22.19_0.xlsx"
+
+
+download.file(url2020,
+              destfile = "new.xlsx")
+
+download.file(url2019,
+              destfile = "old.xlsx")
+
+new <- read_excel("new.xlsx",
+                  skip = 3)
+
+old <- read_excel("old.xlsx", 
+                  skip = 3)
+  
+new <- new %>% 
+  clean_names() %>% 
+  filter( !is.na(course_name)) 
+
+old <- old %>% 
+  clean_names() %>% 
+  filter( !is.na(course_name))
+
+
+new_classes <- new %>% 
+  anti_join(old, by = 'course_id')
+
+new_classes %>% 
+  arrange(desc(total)) %>% 
+  head(5)
+
+```
